@@ -89,7 +89,9 @@ streamlit run src/app.py
 ## 📁 Project Structure
 
 ```
-sgpa-analyzer/
+sgpa-vizualizer/
+├── data/
+│   └── grade_cards/    # Store uploaded PDFs here
 ├── src/
 │   ├── __init__.py
 │   ├── app.py                 # Main Streamlit application

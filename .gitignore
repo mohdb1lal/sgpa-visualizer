@@ -39,3 +39,6 @@ Thumbs.db
 # Project specific
 uploads/
 *.pdf
+
+data/grade_cards/*
+!data/grade_cards/.gitkeep

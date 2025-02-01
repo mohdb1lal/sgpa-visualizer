@@ -95,18 +95,10 @@ Check out the live version of the app here:
 
 ---
 
-## 📸 Adding Screenshots
+## 📸 Screenshots
 
-To make your project more engaging, add screenshots of your app in action! Here's how:
-
-1. Take screenshots of your app (e.g., the upload page, chart visualization).
-2. Save them in a folder named `screenshots/` in your project root.
-3. Add them to your README using Markdown:
-
-```markdown
 ![Screenshot 1](screenshots/screenshot1.png)
 ![Screenshot 2](screenshots/screenshot2.png)
-```
 
 ---
 

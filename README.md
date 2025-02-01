@@ -110,7 +110,7 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 ---
 
-Made with ❤️ by [@mohd.b1lal] | [GitHub](https://github.com/yourusername)
+Made with ❤️ by @mohd.b1lal | [GitHub](https://github.com/yourusername)
 
 ````
 

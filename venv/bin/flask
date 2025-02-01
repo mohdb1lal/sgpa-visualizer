@@ -1,5 +1,5 @@
 #!/bin/sh
-'''exec' "/Users/admin/My Projects/sgpa-visualizer/.venv/bin/python" "$0" "$@"
+'''exec' "/Users/admin/My Projects/sgpa-visualizer/venv/bin/python" "$0" "$@"
 ' '''
 # -*- coding: utf-8 -*-
 import re

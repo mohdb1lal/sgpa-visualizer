@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SGPA Visualizer</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="/static/styles.css" />
@@ -8,65 +10,47 @@
   <body>
     <div class="container">
       <h1>📊 SGPA Progress Visualizer</h1>
-
-      <div class="upload-section">
+      <div
+        class="upload-section"
+        onclick="document.getElementById('fileInput').click()"
+      >
         <input type="file" id="fileInput" multiple accept=".pdf" hidden />
-        <button onclick="document.getElementById('fileInput').click()">
-          📁 Upload Grade Cards
-        </button>
-        <span id="fileCount">0 files selected</span>
+        <p>📁 Click to Upload Grade Cards</p>
+        <span id="fileCount">No files selected</span>
         <div id="loading" class="loading-spinner" hidden></div>
       </div>
-
       <div class="chart-container">
         <canvas id="sgpaChart"></canvas>
       </div>
     </div>
-
     <footer>
       Made with ❤️ by [Your Name] |
       <a href="https://github.com/yourusername/sgpa-visualizer" target="_blank"
         >GitHub</a
       >
     </footer>
-
     <script>
       let chart = null;
-      const MAX_FILES = 8;
-
       document
         .getElementById("fileInput")
-        .addEventListener("change", async ({ target }) => {
-          const files = target.files;
-          if (files.length > MAX_FILES) {
-            showError(`Maximum ${MAX_FILES} files allowed`);
-            return;
-          }
-
-          showLoading(true);
+        .addEventListener("change", async (event) => {
+          const files = event.target.files;
           document.getElementById(
             "fileCount"
           ).textContent = `${files.length} files selected`;
-
+          showLoading(true);
           try {
             const formData = new FormData();
             Array.from(files).forEach((file) => formData.append("files", file));
-
             const response = await fetch("/upload", {
               method: "POST",
               body: formData,
             });
-
-            if (!response.ok)
-              throw new Error(`Upload failed: ${response.status}`);
-
+            if (!response.ok) throw new Error("Upload failed");
             const { semesters, values } = await response.json();
-            if (values.every((v) => v === null))
-              throw new Error("No valid SGPA data found");
-
             renderChart(semesters, values);
           } catch (error) {
-            showError(error.message);
+            alert(error.message);
           } finally {
             showLoading(false);
           }
@@ -75,7 +59,6 @@
       function renderChart(labels, data) {
         const ctx = document.getElementById("sgpaChart").getContext("2d");
         if (chart) chart.destroy();
-
         chart = new Chart(ctx, {
           type: "line",
           data: {
@@ -95,30 +78,15 @@
           options: {
             responsive: true,
             scales: {
-              y: {
-                min: 0,
-                max: 10,
-                title: { display: true, text: "SGPA" },
-              },
+              y: { min: 0, max: 10, title: { display: true, text: "SGPA" } },
             },
-            plugins: {
-              legend: { position: "bottom" },
-              tooltip: { enabled: true },
-            },
+            plugins: { legend: { position: "bottom" } },
           },
         });
       }
 
       function showLoading(show) {
         document.getElementById("loading").hidden = !show;
-      }
-
-      function showError(message) {
-        const errorDiv = document.createElement("div");
-        errorDiv.className = "error-message";
-        errorDiv.textContent = message;
-        document.body.prepend(errorDiv);
-        setTimeout(() => errorDiv.remove(), 5000);
       }
     </script>
   </body>

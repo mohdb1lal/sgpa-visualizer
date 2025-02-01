@@ -3,7 +3,9 @@ from config import Config
 import os
 
 def create_app(config_class=Config):
-    app = Flask(__name__, template_folder=os.path.abspath('templates'))
+    app = Flask(__name__, 
+                template_folder=os.path.abspath('templates'),
+                static_folder=os.path.abspath('static'))  # Add this line
     app.config.from_object(config_class)
 
     from app.routes import bp

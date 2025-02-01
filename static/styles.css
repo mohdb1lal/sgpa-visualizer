@@ -1,3 +1,4 @@
+/* static/styles.css */
 @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;700&display=swap");
 
 body {
@@ -123,5 +124,25 @@ footer a:hover {
 
   .chart-container {
     padding: 1rem;
+  }
+}
+
+/* Add this for the loading spinner */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+  width: 24px;
+  height: 24px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #4bc0c0;
+  border-radius: 50%;
+  margin: 1rem auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }

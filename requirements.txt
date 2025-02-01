@@ -1,7 +1,2 @@
-streamlit==1.31.0
-pypdf==3.17.4
-pandas==2.1.4
-plotly==5.18.0
-pytest==7.4.4
-black==24.1.1
-flake8==7.0.0
+Flask==3.0.2
+PyMuPDF==1.23.8

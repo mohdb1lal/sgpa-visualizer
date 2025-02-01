@@ -1,188 +1,136 @@
-# SGPA Analyzer
+````markdown
+# 📊 SGPA Visualizer
 
-A web application that analyzes and visualizes semester-wise SGPA progression from KTU (APJ Abdul Kalam Technological University) grade cards. Upload your semester PDFs and get instant visualization of your academic performance.
+![Project Screenshot](screenshot.png)
 
-## 🚀 Features
+A web application to visualize your academic progress by extracting SGPA data from university grade cards (PDF format). Built with Flask, PyMuPDF, and Chart.js.
 
-- **PDF Processing**
+---
 
-  - Upload multiple semester grade cards in PDF format
-  - Automatic SGPA extraction
-  - Support for KTU grade card format
-  - Error handling for invalid/corrupt PDFs
+## 🌟 Features
 
-- **Visualization**
+- **PDF Processing**: Automatically extracts SGPA and semester information from grade cards.
+- **Interactive Chart**: Visualizes your SGPA progress across semesters.
+- **Drag & Drop**: Easily upload multiple PDF files.
+- **Responsive Design**: Works seamlessly on all devices.
+- **Error Handling**: Provides clear error messages for invalid files or missing data.
 
-  - Interactive line graph showing SGPA progression
-  - Semester-wise performance tracking
-  - Responsive and dynamic charts using Plotly
-  - Export options for graphs
+---
 
-- **Analysis**
-  - Calculate overall performance metrics
-  - View semester-wise statistics
-  - Track performance trends
-  - Detailed statistical summary
+## 🛠️ Installation
 
-## 🛠️ Technologies Used
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/sgpa-visualizer.git
+   cd sgpa-visualizer
+   ```
+````
 
-- **Python 3.x** - Core programming language
-- **Streamlit** - Web interface
-- **PyPDF2** - PDF processing
-- **Plotly** - Data visualization
-- **Pandas** - Data manipulation
-- **pytest** - Testing framework
+2. Set up a virtual environment:
 
-## 📋 Prerequisites
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
 
-- Python 3.8 or higher
-- pip package manager
-- Git (for version control)
+3. Install dependencies:
 
-## 💻 Installation
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-1. **Clone the repository**
+4. Run the application:
 
-```bash
-git clone https://github.com/yourusername/sgpa-analyzer.git
-cd sgpa-analyzer
-```
+   ```bash
+   flask run
+   ```
 
-2. **Create and activate virtual environment**
+5. Open your browser and navigate to:
+   ```
+   http://localhost:5000
+   ```
 
-```bash
-# Create virtual environment
-python -m venv venv
+---
 
-# Activate virtual environment
-# On Windows
-venv\Scripts\activate
-# On macOS/Linux
-source venv/bin/activate
-```
+## 🚀 Usage
 
-3. **Install dependencies**
+1. Click the **Upload Grade Cards** button.
+2. Select your PDF grade cards (up to 8 files, one per semester).
+3. View your SGPA progress in the interactive chart.
 
-```bash
-pip install -r requirements.txt
-```
+---
 
-## 🎯 Usage
+## 🧰 Tech Stack
 
-1. **Start the application**
+- **Backend**: Python Flask
+- **PDF Processing**: PyMuPDF
+- **Frontend**: HTML, CSS, JavaScript
+- **Charting**: Chart.js
 
-```bash
-streamlit run src/app.py
-```
+---
 
-2. **Access the web interface**
-
-- Open your browser
-- Navigate to `http://localhost:8501`
-
-3. **Upload grade cards**
-
-- Click on "Upload PDFs" button
-- Select one or more KTU grade card PDFs
-- View the generated visualization and analysis
-
-## 📁 Project Structure
+## 📂 Project Structure
 
 ```
-sgpa-vizualizer/
-├── data/
-│   └── grade_cards/    # Store uploaded PDFs here
-├── src/
-│   ├── __init__.py
-│   ├── app.py                 # Main Streamlit application
-│   └── utils/
-│       ├── __init__.py
-│       ├── pdf_processor.py   # PDF processing utilities
-│       └── visualizer.py      # Data visualization utilities
-├── tests/
-│   ├── __init__.py
-│   ├── test_pdf_processor.py  # PDF processor tests
-│   └── test_visualizer.py     # Visualizer tests
-├── .gitignore
-├── README.md
-├── requirements.txt
-└── LICENSE
+sgpa-visualizer/
+├── app/               # Flask application
+├── static/            # Static files (CSS, JS)
+├── templates/         # HTML templates
+├── config.py          # Configuration settings
+├── requirements.txt   # Dependencies
+├── README.md          # Project documentation
+└── .gitignore         # Files to ignore in Git
 ```
 
-## 🧪 Testing
-
-Run the test suite:
-
-```bash
-pytest tests/
-```
+---
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create your feature branch
-   ```bash
-   git checkout -b feature/AmazingFeature
-   ```
-3. Commit your changes
-   ```bash
-   git commit -m 'Add some AmazingFeature'
-   ```
-4. Push to the branch
-   ```bash
-   git push origin feature/AmazingFeature
-   ```
-5. Open a Pull Request
+Contributions are welcome! Please follow these steps:
 
-## 📝 Development Guidelines
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/AmazingFeature`).
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
+4. Push to the branch (`git push origin feature/AmazingFeature`).
+5. Open a Pull Request.
 
-1. **Code Style**
-
-   - Follow PEP 8 guidelines
-   - Use meaningful variable names
-   - Add docstrings for functions and classes
-
-2. **Testing**
-
-   - Write tests for new features
-   - Maintain test coverage
-   - Run tests before committing
-
-3. **Version Control**
-   - Create feature branches
-   - Write clear commit messages
-   - Keep commits focused and atomic
-
-## 🔍 Future Enhancements
-
-- [ ] Support for different university grade card formats
-- [ ] CGPA prediction based on current trends
-- [ ] Enhanced statistical analysis
-- [ ] Multiple visualization options
-- [ ] PDF batch processing
-- [ ] Export functionality for reports
-- [ ] User authentication system
-- [ ] Grade card data backup
-
-## 🐛 Known Issues
-
-- Currently supports only KTU grade card format
-- Limited to PDF files only
-- Requires specific PDF formatting
-
-## 📫 Contact
-
-Your Name - your.email@example.com
-
-Project Link: [https://github.com/yourusername/sgpa-analyzer](https://github.com/yourusername/sgpa-analyzer)
+---
 
 ## 📜 License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
+---
 
 ## 🙏 Acknowledgments
 
-- APJ Abdul Kalam Technological University
-- Streamlit Documentation
-- PyPDF2 Documentation
-- Plotly Community
+- [Flask](https://flask.palletsprojects.com/) for the web framework.
+- [PyMuPDF](https://pymupdf.readthedocs.io/) for PDF processing.
+- [Chart.js](https://www.chartjs.org/) for data visualization.
+
+---
+
+Made with ❤️ by [Your Name] | [GitHub](https://github.com/yourusername)
+
+````
+
+---
+
+### **Screenshot**
+Add a `screenshot.png` to your repository to showcase the application. You can take a screenshot of the app in action and place it in the root directory.
+
+---
+
+### **Final Steps**
+1. Push your project to GitHub:
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git remote add origin https://github.com/yourusername/sgpa-visualizer.git
+   git push -u origin main
+````
+
+2. Share the repository link with your college!
+
+This version is now polished, visually appealing, and ready for sharing. Let me know if you need further assistance! 🚀

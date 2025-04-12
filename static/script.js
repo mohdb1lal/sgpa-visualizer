@@ -122,6 +122,9 @@ async function handleFiles(files) {
     // Enable download button
     document.getElementById("downloadChartBtn").disabled = false;
 
+    // Show the results container with chart and metrics
+    document.getElementById("resultsContainer").style.display = "block";
+
     // Render the chart with SGPA only
     updateChartView();
 
@@ -131,6 +134,11 @@ async function handleFiles(files) {
     // Shrink the upload area and show the "Add More" button
     uploadSection.classList.add("minimized");
     addMoreBtn.style.display = "block";
+
+    // Scroll to the results
+    document
+      .getElementById("resultsContainer")
+      .scrollIntoView({ behavior: "smooth" });
   } catch (error) {
     showToast(error.message, "error");
   } finally {

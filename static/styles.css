@@ -253,11 +253,11 @@ main {
 /* Info box */
 .info-box {
   display: flex;
-  background: var(--card-bg);
+  background: var(--upload-bg);
   border-radius: 8px;
   padding: 1rem;
-  margin-top: 1rem;
-  box-shadow: 0 4px 6px var(--shadow-color);
+  margin-top: 1.5rem;
+  border: 1px dashed var(--border-color);
 }
 
 .info-icon {
@@ -357,6 +357,76 @@ main {
 
 .dark-mode {
   --accent-color-rgb: 255, 118, 148;
+}
+
+/* Welcome screen styles */
+.welcome-container {
+  margin-top: 2rem;
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 15px var(--shadow-color);
+  animation: fadeIn 0.8s ease-out;
+}
+
+.welcome-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.welcome-header i {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+}
+
+.welcome-header h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.feature-item {
+  background: var(--upload-bg);
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border-color);
+}
+
+.feature-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px var(--shadow-color);
+}
+
+.feature-item i {
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.feature-item h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: var(--text-color);
+}
+
+.feature-item p {
+  font-size: 0.9rem;
+  color: var(--text-color-light);
+  margin: 0;
 }
 
 /* Chart container */
@@ -624,27 +694,20 @@ footer i.fa-heart {
     grid-template-columns: 1fr;
   }
 
-  .chart-controls {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .chart-tabs,
   .chart-actions {
     justify-content: center;
   }
 
-  .tab-button,
   .action-button {
     flex: 1;
     justify-content: center;
   }
 
-  .upload-section {
+  .upload-area {
     padding: 1.5rem;
   }
 
-  .upload-section i {
+  .upload-area i {
     font-size: 2.5rem;
   }
 
@@ -653,6 +716,30 @@ footer i.fa-heart {
     width: 90%;
     left: 5%;
     right: 5%;
+  }
+
+  .welcome-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .welcome-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-box {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .info-icon {
+    margin-right: 0;
+    margin-bottom: 1rem;
   }
 }
 

@@ -42,50 +42,83 @@
             </button>
           </div>
 
-          <div class="info-box">
-            <div class="info-icon"><i class="fas fa-info-circle"></i></div>
-            <div class="info-content">
-              <p>
-                Upload your semester grade cards (PDF) to visualize your
-                progress.
-              </p>
-              <p>The app automatically extracts SGPA and calculates CGPA.</p>
+          <div class="welcome-container">
+            <div class="welcome-header">
+              <i class="fas fa-graduation-cap"></i>
+              <h2>Track Your Academic Progress</h2>
+            </div>
+            <div class="features-grid">
+              <div class="feature-item">
+                <i class="fas fa-file-pdf"></i>
+                <h3>Upload PDFs</h3>
+                <p>Upload your semester grade cards</p>
+              </div>
+              <div class="feature-item">
+                <i class="fas fa-chart-line"></i>
+                <h3>Visualize SGPA</h3>
+                <p>Track your semester performance</p>
+              </div>
+              <div class="feature-item">
+                <i class="fas fa-calculator"></i>
+                <h3>Calculate CGPA</h3>
+                <p>Automatic CGPA calculation</p>
+              </div>
+              <div class="feature-item">
+                <i class="fas fa-download"></i>
+                <h3>Export Chart</h3>
+                <p>Download your progress chart</p>
+              </div>
+            </div>
+            <div class="info-box">
+              <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+              <div class="info-content">
+                <p>
+                  Upload your semester grade cards (PDF) to visualize your
+                  progress.
+                </p>
+                <p>The app automatically extracts SGPA and calculates CGPA.</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="metrics-row">
-          <div class="metric-card cgpa-card">
-            <div class="metric-icon"><i class="fas fa-chart-line"></i></div>
-            <h3>Current CGPA</h3>
-            <div class="metric-value" id="current-cgpa">-</div>
+        <!-- Results container - initially hidden -->
+        <div id="resultsContainer" style="display: none">
+          <div class="metrics-row">
+            <div class="metric-card cgpa-card">
+              <div class="metric-icon"><i class="fas fa-chart-line"></i></div>
+              <h3>Current CGPA</h3>
+              <div class="metric-value" id="current-cgpa">-</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon"><i class="fas fa-chart-simple"></i></div>
+              <h3>Latest SGPA</h3>
+              <div class="metric-value" id="latest-sgpa">-</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon">
+                <i class="fas fa-graduation-cap"></i>
+              </div>
+              <h3>Semesters</h3>
+              <div class="metric-value" id="semester-count">0</div>
+            </div>
           </div>
 
-          <div class="metric-card">
-            <div class="metric-icon"><i class="fas fa-chart-simple"></i></div>
-            <h3>Latest SGPA</h3>
-            <div class="metric-value" id="latest-sgpa">-</div>
+          <div class="chart-container">
+            <div class="loading-overlay" id="chartLoading">
+              <div class="loader"></div>
+              <p>Crunching those numbers...</p>
+            </div>
+            <canvas id="gradeChart"></canvas>
           </div>
 
-          <div class="metric-card">
-            <div class="metric-icon"><i class="fas fa-graduation-cap"></i></div>
-            <h3>Semesters</h3>
-            <div class="metric-value" id="semester-count">0</div>
+          <div class="chart-actions">
+            <button id="downloadChartBtn" class="action-button" disabled>
+              <i class="fas fa-download"></i> Download Chart
+            </button>
           </div>
-        </div>
-
-        <div class="chart-container">
-          <div class="loading-overlay" id="chartLoading">
-            <div class="loader"></div>
-            <p>Crunching those numbers...</p>
-          </div>
-          <canvas id="gradeChart"></canvas>
-        </div>
-
-        <div class="chart-actions">
-          <button id="downloadChartBtn" class="action-button" disabled>
-            <i class="fas fa-download"></i> Download Chart
-          </button>
         </div>
       </main>
 

@@ -3,47 +3,160 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SGPA & CGPA Visualizer</title>
+    <title>Academic Progress Tracker</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='styles.css') }}"
     />
   </head>
   <body>
-    <div class="container">
-      <h1>📊 Academic Progress Visualizer</h1>
-      <div
-        class="upload-section"
-        onclick="document.getElementById('fileInput').click()"
-      >
-        <input type="file" id="fileInput" multiple accept=".pdf" hidden />
-        <p>📁 Click to Upload Grade Cards</p>
-        <span id="fileCount">No files selected</span>
-        <div id="loading" class="loading-spinner" hidden></div>
-      </div>
-      <div class="metrics">
-        <div class="metric-card" id="current-cgpa">
-          <h3>Current CGPA</h3>
-          <div class="metric-value">-</div>
+    <div class="app-container">
+      <header>
+        <h1>📊 Academic Progress Tracker</h1>
+        <div class="theme-toggle">
+          <input type="checkbox" id="darkModeToggle" class="toggle-checkbox" />
+          <label for="darkModeToggle" class="toggle-label">
+            <i class="fas fa-moon"></i>
+            <i class="fas fa-sun"></i>
+            <span class="toggle-ball"></span>
+          </label>
         </div>
-      </div>
-      <div class="chart-container">
-        <canvas id="gradeChart"></canvas>
-      </div>
-      <div class="chart-tabs">
-        <button id="bothView" class="tab-button active">SGPA & CGPA</button>
-        <button id="sgpaView" class="tab-button">SGPA Only</button>
-        <button id="cgpaView" class="tab-button">CGPA Only</button>
-      </div>
+      </header>
+
+      <main>
+        <div class="upload-container">
+          <div class="upload-section" id="dropZone">
+            <input type="file" id="fileInput" multiple accept=".pdf" hidden />
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Drag & drop or click to upload grade cards</p>
+            <span id="fileCount">No files selected</span>
+          </div>
+
+          <div class="info-box">
+            <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+            <div class="info-content">
+              <p>
+                Upload your semester grade cards (PDF) to visualize your
+                progress.
+              </p>
+              <p>The app automatically extracts SGPA and calculates CGPA.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="metrics-row">
+          <div class="metric-card">
+            <div class="metric-icon"><i class="fas fa-chart-line"></i></div>
+            <h3>Current CGPA</h3>
+            <div class="metric-value" id="current-cgpa">-</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon"><i class="fas fa-chart-simple"></i></div>
+            <h3>Latest SGPA</h3>
+            <div class="metric-value" id="latest-sgpa">-</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon"><i class="fas fa-graduation-cap"></i></div>
+            <h3>Semesters</h3>
+            <div class="metric-value" id="semester-count">0</div>
+          </div>
+        </div>
+
+        <div class="chart-container">
+          <div class="loading-overlay" id="chartLoading">
+            <div class="loader"></div>
+            <p>Crunching those numbers...</p>
+          </div>
+          <canvas id="gradeChart"></canvas>
+        </div>
+
+        <div class="chart-controls">
+          <div class="chart-tabs">
+            <button id="bothView" class="tab-button active">
+              <i class="fas fa-chart-line"></i> SGPA & CGPA
+            </button>
+            <button id="sgpaView" class="tab-button">
+              <i class="fas fa-chart-column"></i> SGPA Only
+            </button>
+            <button id="cgpaView" class="tab-button">
+              <i class="fas fa-chart-area"></i> CGPA Only
+            </button>
+          </div>
+
+          <div class="chart-actions">
+            <button id="saveDataBtn" class="action-button" disabled>
+              <i class="fas fa-save"></i> Save Data
+            </button>
+            <button id="downloadChartBtn" class="action-button" disabled>
+              <i class="fas fa-download"></i> Download Chart
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <div class="footer-content">
+          <p>
+            Made with <i class="fas fa-heart"></i> by
+            <a href="https://github.com/mohdb1lal" target="_blank"
+              >@mohd.b1lal</a
+            >
+          </p>
+          <a
+            href="https://github.com/mohdb1lal/sgpa-visualizer"
+            target="_blank"
+          >
+            <i class="fab fa-github"></i> GitHub
+          </a>
+        </div>
+      </footer>
     </div>
-    <footer>
-      Made with ❤️ by @mohd.b1lal
-      <a href="https://github.com/mohdb1lal/sgpa-visualizer" target="_blank"
-        >GitHub</a
-      >
-    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+      <div class="toast-content">
+        <i class="fas fa-check-circle"></i>
+        <div class="toast-message">Success message here</div>
+      </div>
+      <div class="toast-progress"></div>
+    </div>
+
     <script>
+      // Dark mode toggle
+      const darkModeToggle = document.getElementById("darkModeToggle");
+      const body = document.body;
+
+      // Check for saved theme preference or use system preference
+      const savedTheme = localStorage.getItem("theme");
+      const prefersDark =
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+      if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
+        body.classList.add("dark-mode");
+        darkModeToggle.checked = true;
+      }
+
+      darkModeToggle.addEventListener("change", () => {
+        body.classList.toggle("dark-mode");
+        const theme = body.classList.contains("dark-mode") ? "dark" : "light";
+        localStorage.setItem("theme", theme);
+
+        // Update chart theme if it exists
+        if (chart) {
+          updateChartTheme();
+          chart.update();
+        }
+      });
+
+      // File upload handling
       let chart = null;
       let chartData = {
         labels: [],
@@ -54,40 +167,97 @@
       // View state - "both", "sgpa", "cgpa"
       let currentView = "both";
 
-      document
-        .getElementById("fileInput")
-        .addEventListener("change", async (event) => {
-          const files = event.target.files;
-          document.getElementById(
-            "fileCount"
-          ).textContent = `${files.length} files selected`;
-          showLoading(true);
-          try {
-            const formData = new FormData();
-            Array.from(files).forEach((file) => formData.append("files", file));
-            const response = await fetch("/upload", {
-              method: "POST",
-              body: formData,
-            });
-            if (!response.ok) throw new Error("Upload failed");
-            const data = await response.json();
+      const fileInput = document.getElementById("fileInput");
+      const dropZone = document.getElementById("dropZone");
 
-            // Store the data
-            chartData.labels = data.semesters;
-            chartData.sgpa = data.sgpa_values;
-            chartData.cgpa = data.cgpa_values;
+      // Set up drag and drop
+      ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+      });
 
-            // Show current CGPA if available
-            updateCurrentCGPA();
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
 
-            // Render the chart with the current view
-            updateChartView();
-          } catch (error) {
-            alert(error.message);
-          } finally {
-            showLoading(false);
+      ["dragenter", "dragover"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, highlight, false);
+      });
+
+      ["dragleave", "drop"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, unhighlight, false);
+      });
+
+      function highlight() {
+        dropZone.classList.add("highlight");
+      }
+
+      function unhighlight() {
+        dropZone.classList.remove("highlight");
+      }
+
+      dropZone.addEventListener("drop", handleDrop, false);
+
+      function handleDrop(e) {
+        const files = e.dataTransfer.files;
+        fileInput.files = files;
+        handleFiles(files);
+      }
+
+      dropZone.addEventListener("click", () => {
+        fileInput.click();
+      });
+
+      fileInput.addEventListener("change", (event) => {
+        handleFiles(event.target.files);
+      });
+
+      async function handleFiles(files) {
+        if (files.length === 0) return;
+
+        document.getElementById(
+          "fileCount"
+        ).textContent = `${files.length} files selected`;
+        showLoading(true);
+
+        try {
+          const formData = new FormData();
+          Array.from(files).forEach((file) => formData.append("files", file));
+
+          const response = await fetch("/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error("Upload failed");
           }
-        });
+
+          const data = await response.json();
+
+          // Store the data
+          chartData.labels = data.semesters;
+          chartData.sgpa = data.sgpa_values;
+          chartData.cgpa = data.cgpa_values;
+
+          // Update metrics
+          updateMetrics();
+
+          // Enable buttons
+          document.getElementById("saveDataBtn").disabled = false;
+          document.getElementById("downloadChartBtn").disabled = false;
+
+          // Render the chart with the current view
+          updateChartView();
+
+          // Show success toast
+          showToast("Grade data processed successfully!", "success");
+        } catch (error) {
+          showToast(error.message, "error");
+        } finally {
+          showLoading(false);
+        }
+      }
 
       function updateChartView() {
         const ctx = document.getElementById("gradeChart").getContext("2d");
@@ -99,11 +269,19 @@
           datasets.push({
             label: "SGPA",
             data: chartData.sgpa,
-            borderColor: "#4BC0C0",
-            backgroundColor: "rgba(75, 192, 192, 0.2)",
+            borderColor: body.classList.contains("dark-mode")
+              ? "#4BC0C0"
+              : "#4BC0C0",
+            backgroundColor: body.classList.contains("dark-mode")
+              ? "rgba(75, 192, 192, 0.2)"
+              : "rgba(75, 192, 192, 0.2)",
             tension: 0.3,
             fill: true,
-            pointRadius: 5,
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            pointBackgroundColor: body.classList.contains("dark-mode")
+              ? "#1a1a1a"
+              : "#ffffff",
           });
         }
 
@@ -111,13 +289,28 @@
           datasets.push({
             label: "CGPA",
             data: chartData.cgpa,
-            borderColor: "#FF6384",
-            backgroundColor: "rgba(255, 99, 132, 0.2)",
+            borderColor: body.classList.contains("dark-mode")
+              ? "#FF6384"
+              : "#FF6384",
+            backgroundColor: body.classList.contains("dark-mode")
+              ? "rgba(255, 99, 132, 0.2)"
+              : "rgba(255, 99, 132, 0.2)",
             tension: 0.3,
             fill: true,
-            pointRadius: 5,
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            pointBackgroundColor: body.classList.contains("dark-mode")
+              ? "#1a1a1a"
+              : "#ffffff",
           });
         }
+
+        const fontColor = body.classList.contains("dark-mode")
+          ? "#e0e0e0"
+          : "#666";
+        const gridColor = body.classList.contains("dark-mode")
+          ? "rgba(255, 255, 255, 0.1)"
+          : "rgba(0, 0, 0, 0.1)";
 
         chart = new Chart(ctx, {
           type: "line",
@@ -127,16 +320,60 @@
           },
           options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
               y: {
                 min: 0,
                 max: 10,
-                title: { display: true, text: "Grade Points" },
+                grid: {
+                  color: gridColor,
+                },
+                ticks: {
+                  color: fontColor,
+                },
+                title: {
+                  display: true,
+                  text: "Grade Points",
+                  color: fontColor,
+                },
+              },
+              x: {
+                grid: {
+                  color: gridColor,
+                },
+                ticks: {
+                  color: fontColor,
+                },
               },
             },
             plugins: {
-              legend: { position: "bottom" },
+              legend: {
+                position: "top",
+                labels: {
+                  color: fontColor,
+                  font: {
+                    size: 12,
+                  },
+                  usePointStyle: true,
+                  pointStyle: "circle",
+                },
+              },
               tooltip: {
+                backgroundColor: body.classList.contains("dark-mode")
+                  ? "rgba(0, 0, 0, 0.8)"
+                  : "rgba(255, 255, 255, 0.8)",
+                titleColor: body.classList.contains("dark-mode")
+                  ? "#fff"
+                  : "#333",
+                bodyColor: body.classList.contains("dark-mode")
+                  ? "#fff"
+                  : "#333",
+                borderColor: body.classList.contains("dark-mode")
+                  ? "rgba(255, 255, 255, 0.1)"
+                  : "rgba(0, 0, 0, 0.1)",
+                borderWidth: 1,
+                padding: 10,
+                displayColors: true,
                 callbacks: {
                   label: function (context) {
                     let label = context.dataset.label || "";
@@ -151,30 +388,91 @@
                 },
               },
             },
+            animation: {
+              duration: 1500,
+              easing: "easeOutQuart",
+            },
           },
         });
       }
 
-      function updateCurrentCGPA() {
+      function updateChartTheme() {
+        if (!chart) return;
+
+        const fontColor = body.classList.contains("dark-mode")
+          ? "#e0e0e0"
+          : "#666";
+        const gridColor = body.classList.contains("dark-mode")
+          ? "rgba(255, 255, 255, 0.1)"
+          : "rgba(0, 0, 0, 0.1)";
+
+        chart.options.scales.y.grid.color = gridColor;
+        chart.options.scales.x.grid.color = gridColor;
+        chart.options.scales.y.ticks.color = fontColor;
+        chart.options.scales.x.ticks.color = fontColor;
+        chart.options.scales.y.title.color = fontColor;
+        chart.options.plugins.legend.labels.color = fontColor;
+        chart.options.plugins.tooltip.backgroundColor = body.classList.contains(
+          "dark-mode"
+        )
+          ? "rgba(0, 0, 0, 0.8)"
+          : "rgba(255, 255, 255, 0.8)";
+        chart.options.plugins.tooltip.titleColor = body.classList.contains(
+          "dark-mode"
+        )
+          ? "#fff"
+          : "#333";
+        chart.options.plugins.tooltip.bodyColor = body.classList.contains(
+          "dark-mode"
+        )
+          ? "#fff"
+          : "#333";
+
+        chart.data.datasets.forEach((dataset) => {
+          if (dataset.label === "SGPA") {
+            dataset.pointBackgroundColor = body.classList.contains("dark-mode")
+              ? "#1a1a1a"
+              : "#ffffff";
+          } else if (dataset.label === "CGPA") {
+            dataset.pointBackgroundColor = body.classList.contains("dark-mode")
+              ? "#1a1a1a"
+              : "#ffffff";
+          }
+        });
+      }
+
+      function updateMetrics() {
+        // Update current CGPA
         const cgpaValues = chartData.cgpa.filter((val) => val !== null);
         const currentCGPA =
           cgpaValues.length > 0 ? cgpaValues[cgpaValues.length - 1] : null;
 
-        const cgpaElement = document.querySelector(
-          "#current-cgpa .metric-value"
-        );
-        if (currentCGPA !== null) {
-          cgpaElement.textContent = currentCGPA.toFixed(2);
-        } else {
-          cgpaElement.textContent = "-";
-        }
+        document.getElementById("current-cgpa").textContent =
+          currentCGPA !== null ? currentCGPA.toFixed(2) : "-";
+
+        // Update latest SGPA
+        const sgpaValues = chartData.sgpa.filter((val) => val !== null);
+        const latestSGPA =
+          sgpaValues.length > 0 ? sgpaValues[sgpaValues.length - 1] : null;
+
+        document.getElementById("latest-sgpa").textContent =
+          latestSGPA !== null ? latestSGPA.toFixed(2) : "-";
+
+        // Update semester count
+        const semesterCount = sgpaValues.length;
+        document.getElementById("semester-count").textContent = semesterCount;
       }
 
       function showLoading(show) {
-        document.getElementById("loading").hidden = !show;
+        const loadingOverlay = document.getElementById("chartLoading");
+        if (show) {
+          loadingOverlay.style.display = "flex";
+        } else {
+          loadingOverlay.style.display = "none";
+        }
       }
 
-      // Add event listeners for tab buttons
+      // Tab buttons event listeners
       document.getElementById("bothView").addEventListener("click", () => {
         setActiveView("both");
       });
@@ -201,6 +499,89 @@
         if (chartData.labels.length > 0) {
           updateChartView();
         }
+      }
+
+      // Download chart as image
+      document
+        .getElementById("downloadChartBtn")
+        .addEventListener("click", () => {
+          if (!chart) return;
+
+          const canvas = document.getElementById("gradeChart");
+          const image = canvas.toDataURL("image/png", 1.0);
+
+          const link = document.createElement("a");
+          link.download = "academic-progress-chart.png";
+          link.href = image;
+          link.click();
+
+          showToast("Chart downloaded successfully!", "success");
+        });
+
+      // Save data to local storage
+      document.getElementById("saveDataBtn").addEventListener("click", () => {
+        if (chartData.labels.length === 0) return;
+
+        try {
+          localStorage.setItem("academicData", JSON.stringify(chartData));
+          showToast("Your data has been saved locally!", "success");
+        } catch (error) {
+          showToast("Failed to save data", "error");
+        }
+      });
+
+      // Check for saved data on load
+      window.addEventListener("DOMContentLoaded", () => {
+        const savedData = localStorage.getItem("academicData");
+
+        if (savedData) {
+          try {
+            chartData = JSON.parse(savedData);
+
+            if (chartData.labels.length > 0) {
+              updateMetrics();
+              updateChartView();
+
+              // Enable buttons
+              document.getElementById("saveDataBtn").disabled = false;
+              document.getElementById("downloadChartBtn").disabled = false;
+
+              showToast("Loaded your saved academic data", "info");
+            }
+          } catch (error) {
+            console.error("Failed to load saved data:", error);
+          }
+        }
+      });
+
+      // Toast notification
+      function showToast(message, type = "success") {
+        const toast = document.getElementById("toast");
+        const toastMessage = document.querySelector(".toast-message");
+        const icon = toast.querySelector("i");
+
+        // Set type-specific styling
+        toast.className = "toast";
+        toast.classList.add(type);
+
+        // Set icon based on type
+        icon.className = "fas";
+        if (type === "success") icon.classList.add("fa-check-circle");
+        else if (type === "error") icon.classList.add("fa-exclamation-circle");
+        else if (type === "info") icon.classList.add("fa-info-circle");
+        else if (type === "warning")
+          icon.classList.add("fa-exclamation-triangle");
+
+        // Set message
+        toastMessage.textContent = message;
+
+        // Show toast
+        toast.classList.add("show");
+
+        // Hide after 3 seconds
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 3000);
       }
     </script>
   </body>

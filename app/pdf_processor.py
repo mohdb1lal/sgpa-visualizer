@@ -133,6 +133,15 @@ def extract_pdf_data(pdf_bytes):
     # Log the extraction results for debugging
     logger.info(f"Extracted data - Semester: {semester}, SGPA: {sgpa}, Credits: {credits}")
     
+    # If we couldn't find semester or SGPA, return None values
+    if semester is None or sgpa is None:
+        logger.warning("Could not extract required information from PDF")
+        
+    # Default credits to 20 if not found but SGPA is available
+    if credits == 0 and sgpa is not None:
+        credits = 20
+        logger.info(f"Using default credits value of 20")
+    
     return {
         'semester': semester,
         'sgpa': sgpa,

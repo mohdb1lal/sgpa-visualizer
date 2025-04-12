@@ -75,12 +75,22 @@ def upload_files():
                 
             cgpa_values.append(cgpa)
         
-        # Prepare the response data
+        # Filter out semesters that don't have data
+        filled_semesters = []
+        filled_sgpa = []
+        filled_cgpa = []
+        
+        for i in range(1, 9):
+            if semester_data[i]['sgpa'] is not None:
+                filled_semesters.append(f"Sem {i}")
+                filled_sgpa.append(semester_data[i]['sgpa'])
+                filled_cgpa.append(cgpa_values[i-1])
+        
+        # Prepare the response data (only including semesters with data)
         response_data = {
-            "semesters": [f"Sem {i}" for i in range(1, 9)],
-            "sgpa_values": [semester_data[i]['sgpa'] for i in range(1, 9)],
-            "cgpa_values": cgpa_values,
-            "credits": [semester_data[i]['credits'] for i in range(1, 9)]
+            "semesters": filled_semesters,
+            "sgpa_values": filled_sgpa,
+            "cgpa_values": filled_cgpa
         }
         
         return jsonify(response_data)

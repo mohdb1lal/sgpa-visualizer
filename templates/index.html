@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SGPA Visualizer</title>
+    <title>SGPA & CGPA Visualizer</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link
       rel="stylesheet"
@@ -12,7 +12,7 @@
   </head>
   <body>
     <div class="container">
-      <h1>📊 SGPA Progress Visualizer</h1>
+      <h1>📊 Academic Progress Visualizer</h1>
       <div
         class="upload-section"
         onclick="document.getElementById('fileInput').click()"
@@ -22,8 +22,19 @@
         <span id="fileCount">No files selected</span>
         <div id="loading" class="loading-spinner" hidden></div>
       </div>
+      <div class="metrics">
+        <div class="metric-card" id="current-cgpa">
+          <h3>Current CGPA</h3>
+          <div class="metric-value">-</div>
+        </div>
+      </div>
       <div class="chart-container">
-        <canvas id="sgpaChart"></canvas>
+        <canvas id="gradeChart"></canvas>
+      </div>
+      <div class="chart-tabs">
+        <button id="bothView" class="tab-button active">SGPA & CGPA</button>
+        <button id="sgpaView" class="tab-button">SGPA Only</button>
+        <button id="cgpaView" class="tab-button">CGPA Only</button>
       </div>
     </div>
     <footer>
@@ -34,6 +45,15 @@
     </footer>
     <script>
       let chart = null;
+      let chartData = {
+        labels: [],
+        sgpa: [],
+        cgpa: [],
+      };
+
+      // View state - "both", "sgpa", "cgpa"
+      let currentView = "both";
+
       document
         .getElementById("fileInput")
         .addEventListener("change", async (event) => {
@@ -50,8 +70,18 @@
               body: formData,
             });
             if (!response.ok) throw new Error("Upload failed");
-            const { semesters, values } = await response.json();
-            renderChart(semesters, values);
+            const data = await response.json();
+
+            // Store the data
+            chartData.labels = data.semesters;
+            chartData.sgpa = data.sgpa_values;
+            chartData.cgpa = data.cgpa_values;
+
+            // Show current CGPA if available
+            updateCurrentCGPA();
+
+            // Render the chart with the current view
+            updateChartView();
           } catch (error) {
             alert(error.message);
           } finally {
@@ -59,37 +89,118 @@
           }
         });
 
-      function renderChart(labels, data) {
-        const ctx = document.getElementById("sgpaChart").getContext("2d");
+      function updateChartView() {
+        const ctx = document.getElementById("gradeChart").getContext("2d");
         if (chart) chart.destroy();
+
+        const datasets = [];
+
+        if (currentView === "both" || currentView === "sgpa") {
+          datasets.push({
+            label: "SGPA",
+            data: chartData.sgpa,
+            borderColor: "#4BC0C0",
+            backgroundColor: "rgba(75, 192, 192, 0.2)",
+            tension: 0.3,
+            fill: true,
+            pointRadius: 5,
+          });
+        }
+
+        if (currentView === "both" || currentView === "cgpa") {
+          datasets.push({
+            label: "CGPA",
+            data: chartData.cgpa,
+            borderColor: "#FF6384",
+            backgroundColor: "rgba(255, 99, 132, 0.2)",
+            tension: 0.3,
+            fill: true,
+            pointRadius: 5,
+          });
+        }
+
         chart = new Chart(ctx, {
           type: "line",
           data: {
-            labels,
-            datasets: [
-              {
-                label: "SGPA Progress",
-                data,
-                borderColor: "#4BC0C0",
-                backgroundColor: "rgba(75, 192, 192, 0.2)",
-                tension: 0.3,
-                fill: true,
-                pointRadius: 5,
-              },
-            ],
+            labels: chartData.labels,
+            datasets: datasets,
           },
           options: {
             responsive: true,
             scales: {
-              y: { min: 0, max: 10, title: { display: true, text: "SGPA" } },
+              y: {
+                min: 0,
+                max: 10,
+                title: { display: true, text: "Grade Points" },
+              },
             },
-            plugins: { legend: { position: "bottom" } },
+            plugins: {
+              legend: { position: "bottom" },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    let label = context.dataset.label || "";
+                    if (label) {
+                      label += ": ";
+                    }
+                    if (context.parsed.y !== null) {
+                      label += context.parsed.y.toFixed(2);
+                    }
+                    return label;
+                  },
+                },
+              },
+            },
           },
         });
       }
 
+      function updateCurrentCGPA() {
+        const cgpaValues = chartData.cgpa.filter((val) => val !== null);
+        const currentCGPA =
+          cgpaValues.length > 0 ? cgpaValues[cgpaValues.length - 1] : null;
+
+        const cgpaElement = document.querySelector(
+          "#current-cgpa .metric-value"
+        );
+        if (currentCGPA !== null) {
+          cgpaElement.textContent = currentCGPA.toFixed(2);
+        } else {
+          cgpaElement.textContent = "-";
+        }
+      }
+
       function showLoading(show) {
         document.getElementById("loading").hidden = !show;
+      }
+
+      // Add event listeners for tab buttons
+      document.getElementById("bothView").addEventListener("click", () => {
+        setActiveView("both");
+      });
+
+      document.getElementById("sgpaView").addEventListener("click", () => {
+        setActiveView("sgpa");
+      });
+
+      document.getElementById("cgpaView").addEventListener("click", () => {
+        setActiveView("cgpa");
+      });
+
+      function setActiveView(view) {
+        currentView = view;
+
+        // Update active button
+        document.querySelectorAll(".tab-button").forEach((button) => {
+          button.classList.remove("active");
+        });
+
+        document.getElementById(view + "View").classList.add("active");
+
+        // Update the chart
+        if (chartData.labels.length > 0) {
+          updateChartView();
+        }
       }
     </script>
   </body>

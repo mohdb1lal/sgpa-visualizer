@@ -1,150 +1,150 @@
-import fitz
-import re
-import logging
+# 📊 SGPA Visualizer - Your Academic Progress Tracker 🚀
 
-# Set up logging
+Welcome to the **SGPA Visualizer**, a fun and interactive tool to track your academic progress! Whether you're a student, professor, or just curious about your grades, this app will help you visualize your SGPA trends across semesters. Let's dive in! 🎉
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(**name**)
+---
 
-def extract_pdf_data(pdf_bytes):
-"""
-Extract academic data (semester, SGPA, credits) from PDF grade cards.
+## 🌟 Features
 
-    Args:
-        pdf_bytes: The raw bytes of the PDF file
+- **📁 Drag & Drop PDF Upload**: Easily upload your grade cards in PDF format.
+- **📈 Interactive Charts**: Beautiful line charts to visualize your SGPA progress.
+- **🎨 Modern UI**: Sleek design with smooth animations and responsive layout.
+- **🔍 Automatic Semester Detection**: The app detects your semester from the PDF.
+- **📱 Mobile-Friendly**: Works seamlessly on all devices.
+- **🚀 Fast & Efficient**: Built with Flask and Chart.js for a smooth experience.
 
-    Returns:
-        dict: A dictionary containing extracted data with keys:
-            - semester: The semester number (int)
-            - sgpa: The SGPA value (float)
-            - credits: The total credits for the semester (float)
-    """
-    text = ""
-    try:
-        with fitz.open(stream=pdf_bytes, filetype="pdf") as doc:
-            for page in doc:
-                text += page.get_text().lower()
-    except Exception as e:
-        logger.error(f"Error opening PDF: {str(e)}")
-        raise ValueError(f"Invalid PDF format: {str(e)}")
+---
 
-    # Skip processing if the text is too short (likely not a valid grade card)
-    if len(text) < 50:
-        logger.warning("PDF content too short, may not be a valid grade card")
-        return {
-            'semester': None,
-            'sgpa': None,
-            'credits': 0
-        }
+## 🛠️ Tech Stack
 
-    # Extract semester with more comprehensive patterns
-    semester_patterns = [
-        r'(semester|sem)[\s\-]*s?(\d)',  # Basic pattern: semester 3, sem-4, etc.
-        r'(semester|sem)[\s:]*(i{1,3}|iv|v|vi|vii|viii)',  # Roman numerals: semester I, semester II
-        r'(\d)(st|nd|rd|th)[\s]*(semester|sem)',  # Ordinal patterns: 1st semester, 3rd sem
-        r'semester[\s\-]*(\d+)'  # Simple number after "semester"
-    ]
+- **Frontend**: HTML5, CSS3, JavaScript, Chart.js
+- **Backend**: Python, Flask
+- **PDF Processing**: PyMuPDF (Fitz)
+- **Hosting**: PythonAnywhere
 
-    semester = None
-    for pattern in semester_patterns:
-        semester_match = re.search(pattern, text)
-        if semester_match:
-            # For Roman numerals, convert to integers
-            if semester_match.group(2) in ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii']:
-                roman_to_int = {'i': 1, 'ii': 2, 'iii': 3, 'iv': 4, 'v': 5, 'vi': 6, 'vii': 7, 'viii': 8}
-                semester = roman_to_int.get(semester_match.group(2).lower())
-            else:
-                try:
-                    semester = int(semester_match.group(2))
-                except (IndexError, ValueError):
-                    # Might be a pattern where semester number is in group 1
-                    try:
-                        semester = int(semester_match.group(1))
-                    except (IndexError, ValueError):
-                        continue
-            break
+---
 
-    # If we couldn't find semester, try to look for year and convert to semester
-    if semester is None:
-        year_match = re.search(r'(first|second|third|fourth|1st|2nd|3rd|4th)[\s-]year', text)
-        if year_match:
-            year_mapping = {
-                'first': 1, 'second': 3, 'third': 5, 'fourth': 7,
-                '1st': 1, '2nd': 3, '3rd': 5, '4th': 7
-            }
-            year = year_match.group(1).lower()
-            semester = year_mapping.get(year)
+## 📂 File Directory Structure
 
-    # Extract SGPA with more robust patterns
-    sgpa_patterns = [
-        r'sgpa[\s:]*(\d+\.\d+)',  # Basic: sgpa: 8.5, sgpa 9.1
-        r'sgpa[\s\-]*:[\s\-]*(\d+\.\d+)',  # With various separators
-        r'sgpa[\s\-]*[=][\s\-]*(\d+\.\d+)',  # With equals sign
-        r'sgpa[\s\-]*obtained[\s\-:]*(\d+\.\d+)',  # Descriptive format
-        r'semester[\s\-]*(grade|point)[\s\-]*(average|point)[\s\-:=]*(\d+\.\d+)'  # Full SGPA term
-    ]
+Here’s how the project is organized:
 
-    sgpa = None
-    for pattern in sgpa_patterns:
-        sgpa_match = re.search(pattern, text)
-        if sgpa_match:
-            try:
-                # The SGPA value might be in different capture groups depending on the pattern
-                if pattern.count('(') == 3:  # For the last pattern with 3 capture groups
-                    sgpa = float(sgpa_match.group(3))
-                else:
-                    sgpa = float(sgpa_match.group(1))
-                break
-            except (IndexError, ValueError):
-                continue
+```
+sgpa-visualizer/
+├── app/                  # Backend logic
+│   ├── __init__.py       # Flask app initialization
+│   ├── routes.py         # API routes and handlers
+│   ├── pdf_processor.py  # PDF processing logic
+├── static/               # Static files (CSS, JS, images)
+│   └── styles.css        # Styling for the app
+├── static/
+│   └── screenshot1.png   #Interface
+│   └── screenshot2.png   #Chart
+├── templates/            # HTML templates
+│   └── index.html        # Main page
+├── config.py             # Configuration settings
+├── requirements.txt      # Python dependencies
+├── README.md             # You're reading it! 😄
+└── LICENSE               # MIT License
+```
 
-    # Extract credits with various patterns
-    credit_patterns = [
-        r'total[\s\-]*(credits|credit)[\s:]*(\d+\.?\d*)',
-        r'credits[\s\-]*(earned|obtained|completed)[\s:]*(\d+\.?\d*)',
-        r'(earned|obtained|completed)[\s\-]*credits[\s:]*(\d+\.?\d*)',
-        r'credit[\s\-]*(points|hours)[\s:]*(\d+\.?\d*)',
-        r'(\d+\.?\d*)[\s\-]*credits[\s\-]*(earned|obtained|completed)'
-    ]
+---
 
-    credits = 0
-    for pattern in credit_patterns:
-        credits_match = re.search(pattern, text)
-        if credits_match:
-            try:
-                credits = float(credits_match.group(2))
-                break
-            except (IndexError, ValueError):
-                try:
-                    credits = float(credits_match.group(1))
-                except (IndexError, ValueError):
-                    continue
+## 🚀 How to Run This Program
 
-    # If no credits found, try to count credits from individual subjects
-    if credits == 0:
-        # Look for patterns like "4 credits" or "credits: 3" throughout the document
-        subject_credits = re.findall(r'(\d+)[\s\-]*(credit|cr)', text)
-        if subject_credits:
-            try:
-                credits = sum(int(c[0]) for c in subject_credits)
-            except (ValueError, IndexError):
-                pass
+### **Prerequisites**
 
-    # Log the extraction results for debugging
-    logger.info(f"Extracted data - Semester: {semester}, SGPA: {sgpa}, Credits: {credits}")
+- Python 3.8+
+- Git (optional)
 
-    # If we couldn't find semester or SGPA, return None values
-    if semester is None or sgpa is None:
-        logger.warning("Could not extract required information from PDF")
+### **Step 1: Clone the Repository**
 
-    # Default credits to 20 if not found but SGPA is available
-    if credits == 0 and sgpa is not None:
-        credits = 20
-        logger.info(f"Using default credits value of 20")
+```bash
+git clone https://github.com/mohdb1lal/sgpa-visualizer.git
+cd sgpa-visualizer
+```
 
-    return {
-        'semester': semester,
-        'sgpa': sgpa,
-        'credits': credits
-    }
+### **Step 2: Set Up Virtual Environment**
+
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+### **Step 3: Install Dependencies**
+
+```bash
+pip install -r requirements.txt
+```
+
+### **Step 4: Run the Application**
+
+```bash
+flask run
+```
+
+### **Step 5: Open in Browser**
+
+Visit [http://localhost:5000](http://localhost:5000) in your browser.
+
+---
+
+## 🌐 Live Demo
+
+Check out the live version of the app here:  
+👉 [Click here](http://cplab2022.pythonanywhere.com)
+
+---
+
+## 📸 Screenshots
+
+![Screenshot 1](screenshots/screenshot1.png)
+![Screenshot 2](screenshots/screenshot2.png)
+
+---
+
+## 🛠️ How to Contribute
+
+We welcome contributions! Here's how you can help:
+
+1. **Fork the Repository**: Click the "Fork" button on GitHub.
+2. **Create a Branch**:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+3. **Make Your Changes**: Add your awesome code or fixes.
+4. **Commit and Push**:
+   ```bash
+   git commit -m "Add your message here"
+   git push origin feature/your-feature-name
+   ```
+5. **Open a Pull Request**: Describe your changes and submit!
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- **Chart.js** for beautiful visualizations.
+- **PyMuPDF** for PDF processing magic.
+- **PythonAnywhere** for free hosting.
+- **You** for checking out this project! 😊
+
+---
+
+## 💬 Feedback
+
+Have questions or suggestions? Feel free to:
+
+- Open an issue on [GitHub](https://github.com/mohdb1lal/sgpa-visualizer/issues).
+- Reach out to me at [btechfolks](mailto:btechfolks@gmail.com).
+
+---
+
+## 🎉 Happy Coding!
+
+Now go ahead, track your SGPA, and ace your semesters! 🚀
